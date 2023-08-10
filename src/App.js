@@ -18,6 +18,7 @@ function App() {
           <Content></Content>
         </Suspense>
       </Canvas>
+
       <div style={{ position: "fixed" }} id="boundingBOX"></div>
 
       <div
