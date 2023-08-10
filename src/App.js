@@ -8,7 +8,7 @@ import { AnimationMixer, Box3, Vector3 } from "three";
 
 function App() {
   return (
-    <div style={{ width: `100%`, height: `100%` }}>
+    <div style={{ width: `256px`, height: `256px` }}>
       <Canvas
         gl={{
           preserveDrawingBuffer: true,
@@ -109,7 +109,7 @@ function Content() {
       let boundingBOX = document.querySelector("#boundingBOX");
 
       if (boundingBOX) {
-        let sizeXY = 300;
+        let sizeXY = st.gl.getContext().canvas.width / 4;
         boundingBOX.style.top = `${center.y - sizeXY / 2}px`;
         boundingBOX.style.left = `${center.x - sizeXY / 2}px`;
         boundingBOX.style.width = `${sizeXY}px`;
