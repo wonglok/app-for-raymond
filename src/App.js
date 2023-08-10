@@ -67,10 +67,10 @@ function Content() {
     }
   });
 
-  let camList = [];
+  let cameraOptions = [];
   gltf.scene.traverse((it) => {
     if (it.isCamera) {
-      camList.push(it);
+      cameraOptions.push(it);
     }
   });
 
@@ -85,7 +85,7 @@ function Content() {
   let box3 = new Box3();
   let v30 = new Vector3(0, 0, 0);
   useFrame((st, dt) => {
-    let activeCam = camList[1];
+    let activeCam = cameraOptions[1];
     if (activeCam) {
       activeCam.getWorldPosition(st.camera.position);
       activeCam.getWorldQuaternion(st.camera.quaternion);
