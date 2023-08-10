@@ -59,11 +59,13 @@ function Content() {
   useFrame((st, dt) => {
     mixer.update(dt);
   });
-  let Logo2 = false;
+
+  let busName = "Logo2";
+  let movingObject = false;
 
   gltf.scene.traverse((it) => {
-    if (it.name === "Logo2" && !Logo2) {
-      Logo2 = it;
+    if (it.name === busName && !movingObject) {
+      movingObject = it;
     }
   });
 
@@ -91,11 +93,11 @@ function Content() {
       activeCam.getWorldQuaternion(st.camera.quaternion);
     }
 
-    if (Logo2) {
+    if (movingObject) {
       v30.set(0, 0, 0);
       box3.set(v30, v30);
-      box3.expandByObject(Logo2);
-      let center = toScreenPosition(Logo2, st.camera, st.gl);
+      box3.expandByObject(movingObject);
+      let center = toScreenPosition(movingObject, st.camera, st.gl);
 
       let boundingBOX = document.querySelector("#boundingBOX");
 
