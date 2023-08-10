@@ -21,7 +21,13 @@ function App() {
       <div style={{ position: "fixed" }} id="boundingBOX"></div>
 
       <div
-        style={{ position: `fixed`, top: `0%`, right: `0%`, width: "300px" }}
+        style={{
+          position: `fixed`,
+          top: `0%`,
+          right: `0%`,
+          width: "300px",
+          backgroundColor: "white",
+        }}
       >
         {`"The Stanley Plaza, Hong Kong" (https://skfb.ly/6SKoo) by Peter93 is licensed under Creative Commons Attribution (http://creativecommons.org/licenses/by/4.0/).`}
       </div>
