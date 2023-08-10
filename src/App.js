@@ -116,6 +116,9 @@ function Content() {
         boundingBOX.style.height = `${sizeXY}px`;
         boundingBOX.style.background = "rgba(255,255,0,0.3)";
       }
+
+      let dataURL = st.gl.getContext().canvas.toDataURL();
+      // console.log(dataURL);
     }
   });
 
