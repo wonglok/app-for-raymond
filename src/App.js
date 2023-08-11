@@ -103,15 +103,9 @@ function Content() {
       }
     });
     if (movingObject) {
+      movingObject.geometry.computeBoundingBox();
       box3.copy(movingObject.geometry.boundingBox);
       movingObject.updateMatrixWorld();
-
-      let o3 = new Object3D();
-      o3.scale.set(1, 3, 1);
-      o3.updateMatrix();
-      box3.applyMatrix4(o3.matrix);
-
-      // box3.applyMatrix4(movingObject.matrixWorld);
 
       let center = toScreenPosition(movingObject, st.camera, st.gl);
       let max = toScreenPosition(movingObject, st.camera, st.gl, box3.max);
@@ -122,11 +116,11 @@ function Content() {
       if (boundingBOX) {
         st.camera.updateProjectionMatrix();
 
-        let sizeX = (max.x - min.x) * devicePixelRatio;
-        let sizeY = (max.y - min.y) * devicePixelRatio;
+        let sizeX = max.x - min.x;
+        let sizeY = max.y - min.y;
 
-        sizeX = Math.max(sizeX, 30.0);
-        sizeY = Math.max(sizeY, 30.0);
+        sizeX = sizeX + 25.0;
+        sizeY = sizeY + 25.0;
 
         boundingBOX.style.top = `${center.y - sizeY / 2}px`;
         boundingBOX.style.left = `${center.x - sizeX / 2}px`;
