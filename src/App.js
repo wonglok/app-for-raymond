@@ -89,8 +89,9 @@ function Content() {
     });
   }, [animations, gltf.scene, mixer]);
 
-  let box3 = new Box3();
-  let v30 = new Vector3(0, 0, 0);
+  let box3 = useMemo(() => new Box3(), []);
+  let v30 = useMemo(() => new Vector3(0, 0, 0), []);
+
   useFrame((st, dt) => {
     let activeCam = cameraOptions[1];
     if (activeCam) {
