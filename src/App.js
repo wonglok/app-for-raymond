@@ -4,7 +4,17 @@ import "./App.css";
 import { Environment, Html, Text, useGLTF } from "@react-three/drei";
 import { Canvas, createPortal, useFrame, useThree } from "@react-three/fiber";
 import { Suspense, useEffect, useMemo } from "react";
-import { AnimationMixer, Box3, Object3D, Vector3 } from "three";
+import {
+  AnimationMixer,
+  Box2,
+  Box3,
+  BoxHelper,
+  Matrix4,
+  Object3D,
+  Sphere,
+  Vector2,
+  Vector3,
+} from "three";
 
 function App() {
   return (
@@ -39,25 +49,20 @@ function App() {
   );
 }
 
-function toScreenPosition(obj, camera, renderer, offset = new Vector3()) {
+function toScreenPosition(camera, renderer, offset = new Vector3()) {
   var vector = new Vector3();
 
   var widthHalf = (0.5 * renderer.getContext().canvas.width) / devicePixelRatio;
   var heightHalf =
     (0.5 * renderer.getContext().canvas.height) / devicePixelRatio;
 
-  obj.updateMatrixWorld();
-  vector.setFromMatrixPosition(obj.matrixWorld);
   vector.add(offset);
   vector.project(camera);
 
   vector.x = vector.x * widthHalf + widthHalf;
   vector.y = -(vector.y * heightHalf) + heightHalf;
 
-  return {
-    x: vector.x,
-    y: vector.y,
-  };
+  return new Vector2(vector.x, vector.y);
 }
 
 function Content() {
@@ -88,8 +93,13 @@ function Content() {
     });
   }, [animations, gltf.scene, mixer]);
 
+  let boxHelper = useMemo(() => new BoxHelper(), []);
   let box3 = useMemo(() => new Box3(), []);
-
+  let box2 = useMemo(() => new Box2(), []);
+  let center = useMemo(() => new Vector3(), []);
+  let size2d = useMemo(() => new Vector2(), []);
+  let pt = useMemo(() => new Vector3(), []);
+  let sph = useMemo(() => new Sphere(), []);
   useFrame((st, dt) => {
     let activeCam = cameraOptions[1];
     if (activeCam) {
@@ -102,46 +112,75 @@ function Content() {
         movingObject = it;
       }
     });
-    if (movingObject) {
-      movingObject.geometry.computeBoundingBox();
-      box3.copy(movingObject.geometry.boundingBox);
-      movingObject.updateMatrixWorld();
 
-      let center = toScreenPosition(movingObject, st.camera, st.gl);
-      let max = toScreenPosition(movingObject, st.camera, st.gl, box3.max);
-      let min = toScreenPosition(movingObject, st.camera, st.gl, box3.min);
+    if (movingObject) {
+      boxHelper.setFromObject(movingObject);
+
+      console.log(boxHelper);
+
+      // // box3.expandByVector(new Vector3(1, 0.5, 0.5));
+
+      // // let m4 = new Matrix4();
+      // // m4.copyPosition(movingObject.matrixWorld);
+      // // box3.min.applyMatrix4(m4);
+      // // box3.max.applyMatrix4(m4);
+
+      // let sizer = new Vector3();
+      // let center2 = new Vector3();
+      // box3.getSize(sizer);
+      // box3.getCenter(center2);
+
+      // let box2 = new Box2();
+
+      box3.makeEmpty();
+      box2.makeEmpty();
+      movingObject.updateMatrixWorld(true);
+      for (let i = 0; i < boxHelper.geometry.attributes.position.count; i++) {
+        pt.fromBufferAttribute(boxHelper.geometry.attributes.position, i);
+        // pt.applyMatrix4(movingObject.matrixWorld);
+        let expand = toScreenPosition(st.camera, st.gl, pt);
+        box2.expandByPoint(expand);
+      }
+
+      box3.getBoundingSphere(sph);
 
       let boundingBOX = document.querySelector("#boundingBOX");
 
       if (boundingBOX) {
-        st.camera.updateProjectionMatrix();
+        box2.getSize(size2d);
+        let sizerX = size2d.x;
+        let sizerY = size2d.y;
 
-        let sizeX = max.x - min.x;
-        let sizeY = max.y - min.y;
-
-        sizeX = sizeX + 30.0;
-        sizeY = sizeY + 30.0;
-
-        boundingBOX.style.top = `${center.y - sizeY / 2}px`;
-        boundingBOX.style.left = `${center.x - sizeX / 2}px`;
-        boundingBOX.style.width = `${sizeX}px`;
-        boundingBOX.style.height = `${sizeY}px`;
-        boundingBOX.style.background = "rgba(255,255,0,0.3)";
+        boundingBOX.style.left = `${box2.min.x}px`;
+        boundingBOX.style.top = `${box2.min.y}px`;
+        boundingBOX.style.width = `${sizerX}px`;
+        boundingBOX.style.height = `${sizerY}px`;
+        boundingBOX.style.border = "rgba(255,0,0,1) solid 1px";
       }
 
-      let dataURL = st.gl.getContext().canvas.toDataURL();
-      console.log(
-        boundingBOX.style.top,
-        boundingBOX.style.left,
-        boundingBOX.style.width,
-        boundingBOX.style.height
-      );
+      //
+
+      // let dataURL = st.gl.getContext().canvas.toDataURL();
+
+      // console.log(
+      //   boundingBOX.style.top,
+      //   boundingBOX.style.left,
+      //   boundingBOX.style.width,
+      //   boundingBOX.style.height
+      // );
+
       // console.log(dataURL);
     }
   });
 
+  //
+  // frame ID
+  // end of rendering...
+  //
+
   return (
     <>
+      <primitive object={boxHelper}></primitive>
       <Environment files={`/rural_asphalt_road_1k.hdr`}></Environment>
       <primitive object={gltf.scene}></primitive>
     </>
