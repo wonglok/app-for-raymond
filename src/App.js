@@ -19,7 +19,10 @@ function App() {
         </Suspense>
       </Canvas>
 
-      <div style={{ position: "fixed" }} id="boundingBOX"></div>
+      <div
+        style={{ position: "fixed", top: `0px`, left: `0px` }}
+        id="boundingBOX"
+      ></div>
 
       <div
         style={{
@@ -39,8 +42,9 @@ function App() {
 function toScreenPosition(obj, camera, renderer, offset = new Vector3()) {
   var vector = new Vector3();
 
-  var widthHalf = 0.5 * renderer.getContext().canvas.width;
-  var heightHalf = 0.5 * renderer.getContext().canvas.height;
+  var widthHalf = (0.5 * renderer.getContext().canvas.width) / devicePixelRatio;
+  var heightHalf =
+    (0.5 * renderer.getContext().canvas.height) / devicePixelRatio;
 
   obj.updateMatrixWorld();
   vector.setFromMatrixPosition(obj.matrixWorld);
@@ -70,12 +74,6 @@ function Content() {
   let busName = "Logo2";
   let movingObject = false;
 
-  gltf.scene.traverse((it) => {
-    if (it.name === busName && !movingObject) {
-      movingObject = it;
-    }
-  });
-
   let cameraOptions = [];
   gltf.scene.traverse((it) => {
     if (it.isCamera) {
@@ -100,16 +98,23 @@ function Content() {
       activeCam.getWorldQuaternion(st.camera.quaternion);
     }
 
+    gltf.scene.traverse((it) => {
+      if (it.name === busName && !movingObject) {
+        movingObject = it;
+      }
+    });
     if (movingObject) {
       v30.set(0, 0, 0);
       box3.set(v30, v30);
       box3.expandByObject(movingObject);
+
       let center = toScreenPosition(movingObject, st.camera, st.gl);
 
       let boundingBOX = document.querySelector("#boundingBOX");
 
       if (boundingBOX) {
-        let sizeXY = st.gl.getContext().canvas.width / 4;
+        let sizeXY = st.gl.getContext().canvas.width / devicePixelRatio / 3;
+
         boundingBOX.style.top = `${center.y - sizeXY / 2}px`;
         boundingBOX.style.left = `${center.x - sizeXY / 2}px`;
         boundingBOX.style.width = `${sizeXY}px`;
