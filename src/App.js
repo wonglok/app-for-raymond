@@ -119,8 +119,8 @@ function Content() {
         let sizeX = max.x - min.x;
         let sizeY = max.y - min.y;
 
-        sizeX = sizeX + 25.0;
-        sizeY = sizeY + 25.0;
+        sizeX = sizeX + 30.0;
+        sizeY = sizeY + 30.0;
 
         boundingBOX.style.top = `${center.y - sizeY / 2}px`;
         boundingBOX.style.left = `${center.x - sizeX / 2}px`;
