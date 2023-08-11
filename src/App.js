@@ -4,7 +4,7 @@ import "./App.css";
 import { Environment, Html, Text, useGLTF } from "@react-three/drei";
 import { Canvas, createPortal, useFrame, useThree } from "@react-three/fiber";
 import { Suspense, useEffect, useMemo } from "react";
-import { AnimationMixer, Box3, Vector3 } from "three";
+import { AnimationMixer, Box3, Object3D, Vector3 } from "three";
 
 function App() {
   return (
@@ -48,7 +48,6 @@ function toScreenPosition(obj, camera, renderer, offset = new Vector3()) {
 
   obj.updateMatrixWorld();
   vector.setFromMatrixPosition(obj.matrixWorld);
-
   vector.add(offset);
   vector.project(camera);
 
@@ -90,7 +89,6 @@ function Content() {
   }, [animations, gltf.scene, mixer]);
 
   let box3 = useMemo(() => new Box3(), []);
-  let v30 = useMemo(() => new Vector3(0, 0, 0), []);
 
   useFrame((st, dt) => {
     let activeCam = cameraOptions[1];
@@ -105,25 +103,45 @@ function Content() {
       }
     });
     if (movingObject) {
-      v30.set(0, 0, 0);
-      box3.set(v30, v30);
-      box3.expandByObject(movingObject);
+      box3.copy(movingObject.geometry.boundingBox);
+      movingObject.updateMatrixWorld();
+
+      let o3 = new Object3D();
+      o3.scale.set(1, 3, 1);
+      o3.updateMatrix();
+      box3.applyMatrix4(o3.matrix);
+
+      // box3.applyMatrix4(movingObject.matrixWorld);
 
       let center = toScreenPosition(movingObject, st.camera, st.gl);
+      let max = toScreenPosition(movingObject, st.camera, st.gl, box3.max);
+      let min = toScreenPosition(movingObject, st.camera, st.gl, box3.min);
 
       let boundingBOX = document.querySelector("#boundingBOX");
 
       if (boundingBOX) {
-        let sizeXY = st.gl.getContext().canvas.width / devicePixelRatio / 3;
+        st.camera.updateProjectionMatrix();
 
-        boundingBOX.style.top = `${center.y - sizeXY / 2}px`;
-        boundingBOX.style.left = `${center.x - sizeXY / 2}px`;
-        boundingBOX.style.width = `${sizeXY}px`;
-        boundingBOX.style.height = `${sizeXY}px`;
+        let sizeX = (max.x - min.x) * devicePixelRatio;
+        let sizeY = (max.y - min.y) * devicePixelRatio;
+
+        sizeX = Math.max(sizeX, 30.0);
+        sizeY = Math.max(sizeY, 30.0);
+
+        boundingBOX.style.top = `${center.y - sizeY / 2}px`;
+        boundingBOX.style.left = `${center.x - sizeX / 2}px`;
+        boundingBOX.style.width = `${sizeX}px`;
+        boundingBOX.style.height = `${sizeY}px`;
         boundingBOX.style.background = "rgba(255,255,0,0.3)";
       }
 
       let dataURL = st.gl.getContext().canvas.toDataURL();
+      console.log(
+        boundingBOX.style.top,
+        boundingBOX.style.left,
+        boundingBOX.style.width,
+        boundingBOX.style.height
+      );
       // console.log(dataURL);
     }
   });
