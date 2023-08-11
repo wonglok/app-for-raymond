@@ -43,11 +43,11 @@ function App() {
                 frameNumber: i,
                 totalFrame: 250,
               });
+              console.log(result);
 
               await new Promise((resolve) => {
                 requestAnimationFrame(resolve);
               });
-              console.log(result);
             }
           }}
         >
