@@ -65,15 +65,12 @@ function toScreenPosition(camera, renderer, offset = new Vector3()) {
   return new Vector2(vector.x, vector.y);
 }
 
-function Content() {
+function Content({ onReady = () => {} }) {
   let gltf = useGLTF(`/compress.glb`);
 
   let mixer = useMemo(() => {
     return new AnimationMixer(gltf.scene);
   }, [gltf]);
-  useFrame((st, dt) => {
-    mixer.update(dt);
-  });
 
   let busName = "Logo2";
   let movingObject = false;
@@ -96,7 +93,7 @@ function Content() {
   let boxHelper = useMemo(() => new BoxHelper(), []);
   let box3 = useMemo(() => new Box3(), []);
   let box2 = useMemo(() => new Box2(), []);
-  let center = useMemo(() => new Vector3(), []);
+  // let center = useMemo(() => new Vector3(), []);
   let size2d = useMemo(() => new Vector2(), []);
   let pt = useMemo(() => new Vector3(), []);
   let sph = useMemo(() => new Sphere(), []);
@@ -116,22 +113,6 @@ function Content() {
     if (movingObject) {
       boxHelper.setFromObject(movingObject);
 
-      console.log(boxHelper);
-
-      // // box3.expandByVector(new Vector3(1, 0.5, 0.5));
-
-      // // let m4 = new Matrix4();
-      // // m4.copyPosition(movingObject.matrixWorld);
-      // // box3.min.applyMatrix4(m4);
-      // // box3.max.applyMatrix4(m4);
-
-      // let sizer = new Vector3();
-      // let center2 = new Vector3();
-      // box3.getSize(sizer);
-      // box3.getCenter(center2);
-
-      // let box2 = new Box2();
-
       box3.makeEmpty();
       box2.makeEmpty();
       movingObject.updateMatrixWorld(true);
@@ -145,38 +126,35 @@ function Content() {
       box3.getBoundingSphere(sph);
 
       let boundingBOX = document.querySelector("#boundingBOX");
+      box2.getSize(size2d);
+      let sizerX = size2d.x;
+      let sizerY = size2d.y;
 
       if (boundingBOX) {
-        box2.getSize(size2d);
-        let sizerX = size2d.x;
-        let sizerY = size2d.y;
-
         boundingBOX.style.left = `${box2.min.x}px`;
         boundingBOX.style.top = `${box2.min.y}px`;
         boundingBOX.style.width = `${sizerX}px`;
         boundingBOX.style.height = `${sizerY}px`;
         boundingBOX.style.border = "rgba(255,0,0,1) solid 1px";
       }
-
-      //
-
-      // let dataURL = st.gl.getContext().canvas.toDataURL();
-
-      // console.log(
-      //   boundingBOX.style.top,
-      //   boundingBOX.style.left,
-      //   boundingBOX.style.width,
-      //   boundingBOX.style.height
-      // );
-
-      // console.log(dataURL);
+      let dataURL = st.gl.getContext().canvas.toDataURL();
+      console.table([
+        { dataURL, sizerX, sizerY, x: box2.min.x, y: box2.min.y },
+      ]);
     }
   });
 
-  //
-  // frame ID
-  // end of rendering...
-  //
+  useEffect(() => {
+    let api = {
+      onEachFrame: () => {
+        let dt = 1 / 60;
+        mixer.update(dt);
+      },
+    };
+    onReady(api);
+
+    return () => {};
+  });
 
   return (
     <>
