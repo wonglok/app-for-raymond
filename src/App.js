@@ -37,11 +37,11 @@ function App() {
       {api && (
         <button
           onClick={async () => {
-            for (let i = 0; i < 250; i++) {
+            for (let i = 0; i < 500; i++) {
               let result = api.onEachFrame({
-                currentTime: api.duration * (i / 250),
+                currentTime: api.duration * (i / 500),
                 frameNumber: i,
-                totalFrame: 250,
+                totalFrame: 500,
               });
               console.log(result);
 
