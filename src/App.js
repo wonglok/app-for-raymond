@@ -27,9 +27,9 @@ import { clone } from "three/examples/jsm/utils/SkeletonUtils";
 function App() {
   return (
     <>
-      <GUI></GUI>
-      <GUI></GUI>
-      <GUI></GUI>
+      <GUI glbFile={`/compress.glb`}></GUI>
+      <GUI glbFile={`/compress.glb`}></GUI>
+      <GUI glbFile={`/compress.glb`}></GUI>
     </>
   );
 }
