@@ -22,7 +22,6 @@ import {
   Vector2,
   Vector3,
 } from "three";
-import { clone } from "three/examples/jsm/utils/SkeletonUtils";
 
 function App() {
   return (
@@ -81,26 +80,42 @@ function GUI({ glbFile = `/compress.glb` }) {
         ></div>
       </div>
       {api && (
-        <button
-          onClick={async () => {
-            for (let i = 0; i < 500; i++) {
-              let result = api.onEachFrame({
-                currentTime: api.duration * (i / 500),
-                frameNumber: i,
-                totalFrame: 500,
-              });
-              console.table([result]);
-
-              await new Promise((resolve) => {
-                setTimeout(() => {
-                  requestAnimationFrame(resolve);
+        <>
+          <button
+            onClick={async () => {
+              for (let i = 0; i < 500; i++) {
+                let result = api.onEachFrame({
+                  currentTime: api.duration * (i / 500),
+                  frameNumber: i,
+                  totalFrame: 500,
                 });
-              });
-            }
-          }}
-        >
-          Render All
-        </button>
+                console.table([result]);
+
+                await new Promise((resolve) => {
+                  setTimeout(() => {
+                    requestAnimationFrame(resolve);
+                  });
+                });
+              }
+            }}
+          >
+            Render All
+          </button>
+
+          <select
+            onChange={(event) => {
+              api.setCurrentCameraIDX(event.target.value);
+            }}
+          >
+            {api.cameraOptions.map((it, i) => {
+              return (
+                <option key={i} value={i}>
+                  {it.name}
+                </option>
+              );
+            })}
+          </select>
+        </>
       )}
       <div
         style={{
@@ -141,6 +156,7 @@ function AgapeEngine({
   let gltf = useGLTF(glbURL);
   // gltf.scene = clone(gltf.scene);
 
+  let currentCamera = useRef(1);
   let group = useMemo(() => {
     return new Object3D();
   }, []);
@@ -180,7 +196,7 @@ function AgapeEngine({
   let pt = useMemo(() => new Vector3(), []);
   let sph = useMemo(() => new Sphere(), []);
   useFrame((st, dt) => {
-    let activeCam = cameraOptions[1];
+    let activeCam = cameraOptions[currentCamera.current];
     if (activeCam) {
       activeCam.getWorldPosition(st.camera.position);
       activeCam.getWorldQuaternion(st.camera.quaternion);
@@ -193,6 +209,12 @@ function AgapeEngine({
     () => {
       let api = {
         duration: animations[0].duration,
+        setCurrentCameraIDX: (idx) => {
+          let st = get();
+
+          currentCamera.current = idx;
+          st.gl.render(st.scene, st.camera);
+        },
         onEachFrame: ({ currentTime = 0, frameNumber = 0, totalFrame = 1 }) => {
           mixer.setTime(currentTime);
           let st = get();
@@ -260,7 +282,7 @@ function AgapeEngine({
       // sph,
     ]
   );
-
+  api.cameraOptions = cameraOptions;
   useEffect(() => {
     if (!api) {
       return;
