@@ -1,22 +1,14 @@
 // import logo from "./logo.svg";
 import "./App.css";
 
-import { Environment, Html, Text, useGLTF } from "@react-three/drei";
+import { Environment, useGLTF } from "@react-three/drei";
 import { Canvas, createPortal, useFrame, useThree } from "@react-three/fiber";
-import {
-  Suspense,
-  createRef,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import {
   AnimationMixer,
   Box2,
   Box3,
   BoxHelper,
-  Matrix4,
   Object3D,
   Sphere,
   Vector2,
