@@ -103,6 +103,7 @@ function GUI({ glbFile = `/compress.glb` }) {
           </button>
 
           <select
+            defaultValue={api.getCurrentCameraIDX()}
             onChange={(event) => {
               api.setCurrentCameraIDX(event.target.value);
             }}
@@ -209,6 +210,9 @@ function AgapeEngine({
     () => {
       let api = {
         duration: animations[0].duration,
+        getCurrentCameraIDX: () => {
+          return currentCamera.current;
+        },
         setCurrentCameraIDX: (idx) => {
           let st = get();
 
