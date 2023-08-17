@@ -20,7 +20,7 @@ function App() {
     <>
       <GUI glbFile={`/compress.glb`}></GUI>
       <GUI glbFile={`/compress2.glb`}></GUI>
-      <GUI glbFile={`/compress.glb`}></GUI>
+      <GUI glbFile={`/compress3.glb`}></GUI>
     </>
   );
 }
