@@ -19,11 +19,12 @@ function App() {
   return (
     <>
       <GUI glbFile={`/compress.glb`}></GUI>
-      <GUI glbFile={`/compress.glb`}></GUI>
+      <GUI glbFile={`/compress2.glb`}></GUI>
       <GUI glbFile={`/compress.glb`}></GUI>
     </>
   );
 }
+
 function GUI({ glbFile = `/compress.glb` }) {
   let [api, setAPI] = useState(false);
 
@@ -149,7 +150,7 @@ function AgapeEngine({
   let gltf = useGLTF(glbURL);
   // gltf.scene = clone(gltf.scene);
 
-  let currentCamera = useRef(1);
+  let currentCamera = useRef(0);
   let group = useMemo(() => {
     return new Object3D();
   }, []);
